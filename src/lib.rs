@@ -158,10 +158,9 @@ impl HcSr04 {
     /// Perform **distance measurement**.
     ///
     /// Returns `Ok` variant if measurement succedes. Inner `Option` value is `None` if no object
-    /// is present within maximum measuring range (*4m*); otherwhise, on `Some` variant instead,
-    /// contained value represents distance expressed as the specified `unit` (**unit of measure**).
-    /// Returns `Err` variant if measurement fails, this may happen if no pulse is detected, e.g.
-    /// when an object is too close.
+    /// is present within maximum measuring range (*4m*); otherwise, on `Some` variant instead,
+    /// contained value represents distance expressed as the specified `unit`
+    /// (**unit of measure**).
     pub fn measure_distance(&mut self, unit: Unit) -> Result<Option<f32>> {
         self.trig.set_high();
         thread::sleep(Duration::from_micros(10));
@@ -171,7 +170,7 @@ impl HcSr04 {
             match self.echo.poll_interrupt(false, Some(self.timeout * 3)) {
                 Ok(Some(Level::High)) => break,
                 Ok(Some(Level::Low)) => continue,
-                Ok(None) => return Err(Error::Timeout()),
+                Ok(None) => return Ok(None),
                 Err(e) => return Err(Error::Gpio(e)),
             }
         }
